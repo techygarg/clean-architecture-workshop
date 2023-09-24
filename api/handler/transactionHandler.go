@@ -1,24 +1,21 @@
 package handler
 
 import (
-	"errors"
-	"myapp/model"
-	request2 "myapp/model/request"
 	"myapp/service"
+	request2 "myapp/service/dto/request"
+	"myapp/service/externalProvider"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type transactionHandler struct {
-	user     service.UserService
-	transfer service.TransferService
+	transactionService service.TransactionService
 }
 
-func NewTransactionHandler(user service.UserService, transfer service.TransferService) transactionHandler {
+func NewTransactionHandler(transactionService service.TransactionService, transfer externalProvider.TransferProvider) transactionHandler {
 	return transactionHandler{
-		user:     user,
-		transfer: transfer,
+		transactionService: transactionService,
 	}
 }
 func (h transactionHandler) Credit(c *gin.Context) {
@@ -28,35 +25,11 @@ func (h transactionHandler) Credit(c *gin.Context) {
 		return
 	}
 
-	userIdentifier := c.GetString("user-identifier")
-
-	user, _ := h.user.GetUser(userIdentifier)
-	if !user.IsActive || !user.CanDeposit {
-		_ = c.Error(errors.New("user can initiate debit"))
-		return
-	}
-
-	refNum, err := h.transfer.TransferMoneyFromProvider(req)
+	err := h.transactionService.Credit(c, req)
 	if err != nil {
 		_ = c.Error(err)
 		return
 	}
 
-	transaction := model.TransactionModel{
-		CurrencyCode:        req.CurrencyCode,
-		Amount:              req.Amount,
-		PaymentMethodCode:   req.PaymentMethodCode,
-		PaymentProviderCode: req.PaymentProviderCode,
-		Type:                "Credit",
-		Status:              "Success",
-		UserIdentifier:      userIdentifier,
-		RefNum:              refNum,
-	}
-
-	err = transaction.Create(c)
-	if err != nil {
-		_ = c.Error(err)
-		return
-	}
 	c.JSON(http.StatusCreated, "transaction created")
 }
