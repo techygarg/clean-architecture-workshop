@@ -1,6 +1,6 @@
 package dao
 
-type TransactionModel struct {
+type TransactionDao struct {
 	Id                  int    `gorm:"primaryKey column:id"`
 	RefNum              string `gorm:"column:ref_num"`
 	CurrencyCode        string `gorm:"column:currency"`

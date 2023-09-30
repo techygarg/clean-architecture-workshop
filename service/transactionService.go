@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"myapp/persistence/dao"
+	"myapp/domain"
 	"myapp/persistence/repository"
 	"myapp/service/dto/request"
 	"myapp/service/dto/response"
@@ -46,7 +46,7 @@ func (s transactionService) Credit(ctx context.Context, req request.CreateTransa
 		return res, err
 	}
 
-	transaction := dao.TransactionModel{
+	transaction := domain.Transaction{
 		CurrencyCode:        req.CurrencyCode,
 		Amount:              req.Amount,
 		PaymentMethodCode:   req.PaymentMethodCode,
