@@ -51,11 +51,15 @@ func (s transactionService) Credit(ctx context.Context, req request.CreateTransa
 		RefNum:              refNum,
 		Amount:              req.Amount,
 		Type:                st.TransactionType("Credit"),
-		Status:              st.TransactionStatus("Success"),
 		PaymentMethodCode:   st.PaymentCode(req.PaymentMethodCode),
 		PaymentProviderCode: st.ProviderCode(req.PaymentProviderCode),
 		UserIdentifier:      st.UserIdentifier(userIdentifier),
 		CurrencyCode:        st.CurrencyCode(req.CurrencyCode),
+	}
+
+	err = transaction.ChangeStatus("Initialized")
+	if err != nil {
+		return res, err
 	}
 
 	id, err := s.transRepo.Create(ctx, transaction)

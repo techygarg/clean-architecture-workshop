@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"errors"
 	. "myapp/domain/types"
 )
 
@@ -14,4 +15,18 @@ type Transaction struct {
 	PaymentProviderCode ProviderCode
 	UserIdentifier      UserIdentifier
 	Status              TransactionStatus
+}
+
+func (d *Transaction) ChangeStatus(newStatus TransactionStatus) error {
+	if d.Status == "" && newStatus.IsInitialized() {
+		d.Status = newStatus
+		return nil
+	}
+	for _, status := range StateTransitionMap[d.Status] {
+		if status == newStatus {
+			d.Status = newStatus
+			return nil
+		}
+	}
+	return errors.New("invalid state transition")
 }
