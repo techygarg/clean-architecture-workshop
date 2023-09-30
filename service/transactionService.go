@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"myapp/domain"
+	st "myapp/domain/types"
 	"myapp/persistence/repository"
 	"myapp/service/dto/request"
 	"myapp/service/dto/response"
@@ -47,14 +48,14 @@ func (s transactionService) Credit(ctx context.Context, req request.CreateTransa
 	}
 
 	transaction := domain.Transaction{
-		CurrencyCode:        req.CurrencyCode,
-		Amount:              req.Amount,
-		PaymentMethodCode:   req.PaymentMethodCode,
-		PaymentProviderCode: req.PaymentProviderCode,
-		Type:                "Credit",
-		Status:              "Success",
-		UserIdentifier:      userIdentifier,
 		RefNum:              refNum,
+		Amount:              req.Amount,
+		Type:                st.TransactionType("Credit"),
+		Status:              st.TransactionStatus("Success"),
+		PaymentMethodCode:   st.PaymentCode(req.PaymentMethodCode),
+		PaymentProviderCode: st.ProviderCode(req.PaymentProviderCode),
+		UserIdentifier:      st.UserIdentifier(userIdentifier),
+		CurrencyCode:        st.CurrencyCode(req.CurrencyCode),
 	}
 
 	id, err := s.transRepo.Create(ctx, transaction)

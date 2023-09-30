@@ -1,13 +1,17 @@
 package domain
 
+import (
+	. "myapp/domain/types"
+)
+
 type Transaction struct {
 	Id                  int
 	RefNum              string
-	CurrencyCode        string
 	Amount              int64
-	Type                string
-	PaymentMethodCode   string
-	PaymentProviderCode string
-	UserIdentifier      string
-	Status              string
+	CurrencyCode        CurrencyCode
+	Type                TransactionType
+	PaymentMethodCode   PaymentCode
+	PaymentProviderCode ProviderCode
+	UserIdentifier      UserIdentifier
+	Status              TransactionStatus
 }
