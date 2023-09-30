@@ -8,7 +8,7 @@ import (
 )
 
 type TransactionRepository interface {
-	Create(ctx context.Context, tran dao.TransactionModel) error
+	Create(ctx context.Context, tran dao.TransactionModel) (int, error)
 }
 
 type transactionRepository struct {
@@ -19,10 +19,10 @@ func NewTransactionRepository(db *gorm.DB) TransactionRepository {
 	return transactionRepository{db: db}
 }
 
-func (r transactionRepository) Create(ctx context.Context, tran dao.TransactionModel) error {
+func (r transactionRepository) Create(ctx context.Context, tran dao.TransactionModel) (id int, err error) {
 	result := r.db.Create(tran)
 	if result.Error != nil {
-		return result.Error
+		return id, result.Error
 	}
-	return nil
+	return tran.Id, nil
 }

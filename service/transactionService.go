@@ -6,11 +6,12 @@ import (
 	"myapp/persistence/dao"
 	"myapp/persistence/repository"
 	"myapp/service/dto/request"
+	"myapp/service/dto/response"
 	"myapp/service/externalProvider"
 )
 
 type TransactionService interface {
-	Credit(ctx context.Context, req request.CreateTransactionRequest) error
+	Credit(ctx context.Context, req request.CreateTransactionRequest) (response.TransactionCreatedResponse, error)
 }
 
 type transactionService struct {
@@ -29,20 +30,20 @@ func NewTransactionService(user externalProvider.UserProvider,
 	}
 }
 
-func (s transactionService) Credit(ctx context.Context, req request.CreateTransactionRequest) error {
+func (s transactionService) Credit(ctx context.Context, req request.CreateTransactionRequest) (res response.TransactionCreatedResponse, err error) {
 	userIdentifier := ctx.Value("user-identifier").(string)
 
 	canDeposit, err := s.userProvider.CanDeposit(userIdentifier)
 	if err != nil {
-		return err
+		return res, err
 	}
 	if !canDeposit {
-		return errors.New("user can't deposit")
+		return res, errors.New("user can't deposit")
 	}
 
 	refNum, err := s.transferProvider.TransferMoneyFromProvider(req)
 	if err != nil {
-		return err
+		return res, err
 	}
 
 	transaction := dao.TransactionModel{
@@ -56,5 +57,7 @@ func (s transactionService) Credit(ctx context.Context, req request.CreateTransa
 		RefNum:              refNum,
 	}
 
-	return s.transRepo.Create(ctx, transaction)
+	id, err := s.transRepo.Create(ctx, transaction)
+	res.Id = id
+	return res, err
 }

@@ -25,11 +25,11 @@ func (h transactionHandler) Credit(c *gin.Context) {
 		return
 	}
 
-	err := h.transactionService.Credit(c, req)
+	res, err := h.transactionService.Credit(c, req)
 	if err != nil {
 		_ = c.Error(err)
 		return
 	}
 
-	c.JSON(http.StatusCreated, "transaction created")
+	c.JSON(http.StatusCreated, res)
 }
