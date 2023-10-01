@@ -11,7 +11,7 @@ import (
 
 type TransactionRepository interface {
 	Create(ctx context.Context, tran domain.Transaction) (int, error)
-	Update(ctx context.Context, tran domain.Transaction) (id int, err error)
+	Update(ctx context.Context, tran domain.Transaction) error
 	GetTransactionById(ctx context.Context, id int) (res *domain.Transaction, err error)
 	GetTransactionByRef(ctx context.Context, refNum string) (res *domain.Transaction, err error)
 	GetTransactionsPaymentMethod(ctx context.Context, code st.PaymentCode) (res []*domain.Transaction, err error)
@@ -35,13 +35,13 @@ func (r transactionRepository) Create(ctx context.Context, tran domain.Transacti
 	return tran.Id, nil
 }
 
-func (r transactionRepository) Update(ctx context.Context, tran domain.Transaction) (id int, err error) {
+func (r transactionRepository) Update(ctx context.Context, tran domain.Transaction) error {
 	tranDao := mapper.ToTransactionDao(tran)
 	result := r.db.Save(tranDao)
 	if result.Error != nil {
-		return id, result.Error
+		return result.Error
 	}
-	return tran.Id, nil
+	return nil
 }
 
 func (r transactionRepository) GetTransactionById(ctx context.Context, id int) (res *domain.Transaction, err error) {
