@@ -9,3 +9,10 @@ type UserResponse struct {
 type TransactionCreatedResponse struct {
 	Id int `json:"id"`
 }
+
+type Transaction struct {
+}
+
+type TransactionList struct {
+	Transactions []Transaction `json:"transactions"`
+}

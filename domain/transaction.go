@@ -2,7 +2,7 @@ package domain
 
 import (
 	"errors"
-	. "myapp/domain/types"
+	. "myapp/domain/coreTypes"
 )
 
 type Transaction struct {

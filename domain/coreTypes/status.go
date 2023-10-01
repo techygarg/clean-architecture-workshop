@@ -1,4 +1,4 @@
-package types
+package coreTypes
 
 const (
 	TrStatusInitialized TransactionStatus = "Initialized"

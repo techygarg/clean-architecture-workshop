@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"myapp/domain"
-	st "myapp/domain/types"
+	st "myapp/domain/coreTypes"
 	"myapp/persistence/repository"
 	"myapp/service/dto/request"
 	"myapp/service/dto/response"
 	"myapp/service/externalProvider"
+	"myapp/service/mapper"
 )
 
 type TransactionService interface {
@@ -29,6 +30,38 @@ func NewTransactionService(user externalProvider.UserProvider,
 		transferProvider: transfer,
 		transRepo:        transRepo,
 	}
+}
+
+func (s transactionService) GetTransactionById(ctx context.Context, id int) (res response.Transaction, err error) {
+	transaction, err := s.transRepo.GetTransactionById(ctx, id)
+	if err != nil {
+		return res, err
+	}
+	return mapper.MapTransactionDomainToDto(transaction), nil
+}
+
+func (s transactionService) GetTransactionByRef(ctx context.Context, refNum string) (res response.Transaction, err error) {
+	transaction, err := s.transRepo.GetTransactionByRef(ctx, refNum)
+	if err != nil {
+		return res, err
+	}
+	return mapper.MapTransactionDomainToDto(transaction), nil
+}
+
+func (s transactionService) GetTransactionsPaymentMethod(ctx context.Context, code st.PaymentCode) (res response.TransactionList, err error) {
+	transactions, err := s.transRepo.GetTransactionsPaymentMethod(ctx, code)
+	if err != nil {
+		return res, err
+	}
+	return mapper.MapTransactionDomainsToDto(transactions), nil
+}
+
+func (s transactionService) GetTransactionsPaymentProvider(ctx context.Context, code st.ProviderCode) (res response.TransactionList, err error) {
+	transactions, err := s.transRepo.GetTransactionsPaymentProvider(ctx, code)
+	if err != nil {
+		return res, err
+	}
+	return mapper.MapTransactionDomainsToDto(transactions), nil
 }
 
 func (s transactionService) Credit(ctx context.Context, req request.CreateTransactionRequest) (res response.TransactionCreatedResponse, err error) {
@@ -65,4 +98,16 @@ func (s transactionService) Credit(ctx context.Context, req request.CreateTransa
 	id, err := s.transRepo.Create(ctx, transaction)
 	res.Id = id
 	return res, err
+}
+
+func (s transactionService) Debit(context.Context) error {
+	return nil
+}
+
+func (s transactionService) Update(context.Context) error {
+	return nil
+}
+
+func (s transactionService) UpdateStatus(context.Context) error {
+	return nil
 }

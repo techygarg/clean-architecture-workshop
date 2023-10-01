@@ -1,4 +1,4 @@
-package types
+package coreTypes
 
 type UserIdentifier string
 type PaymentCode string
